@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useCallback } from "react";
+import { useCallback, useRef } from "react";
 import { useWebSocket } from "./hooks/useWebSocket";
 import AIOutputView from "./components/AIOutputView";
 import ControlPanel from "./components/ControlPanel";
@@ -18,22 +18,41 @@ const Canvas = dynamic(() => import("./components/Canvas"), {
 
 export default function Home() {
   const { connectionState, sendBinary, sendConfig, latestImage } = useWebSocket();
+  const lastSketchRef = useRef<ArrayBuffer | null>(null);
 
   const handleSketchExport = useCallback(
     (blob: Blob) => {
-      blob.arrayBuffer().then((buf) => sendBinary(buf));
+      blob.arrayBuffer().then((buf) => {
+        lastSketchRef.current = buf;
+        sendBinary(buf);
+      });
     },
     [sendBinary]
   );
 
+  // Re-send the last sketch after config changes so the new prompt/strength
+  // takes effect immediately without requiring the user to draw again
+  const resendLastSketch = useCallback(() => {
+    if (lastSketchRef.current) {
+      sendBinary(lastSketchRef.current);
+    }
+  }, [sendBinary]);
+
   const handlePromptChange = useCallback(
-    (prompt: string) => sendConfig({ prompt }),
-    [sendConfig]
+    (prompt: string) => {
+      sendConfig({ prompt });
+      // Small delay to let server process the config update before the sketch
+      setTimeout(resendLastSketch, 50);
+    },
+    [sendConfig, resendLastSketch]
   );
 
   const handleStrengthChange = useCallback(
-    (strength: number) => sendConfig({ strength }),
-    [sendConfig]
+    (strength: number) => {
+      sendConfig({ strength });
+      setTimeout(resendLastSketch, 50);
+    },
+    [sendConfig, resendLastSketch]
   );
 
   return (

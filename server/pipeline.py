@@ -90,15 +90,14 @@ class RealtimeCanvasPipeline:
         self.ready = True
 
     def _run_inference(self, image: Image.Image, control_image: Image.Image) -> Image.Image:
-        # strength controls how much of the original sketch to replace:
-        #   0.0 = keep sketch exactly, 1.0 = fully regenerate
-        #   We want high strength (0.8-1.0) so the model generates a real image
-        #   while ControlNet preserves the sketch *structure*
+        # strength: how much of the sketch to replace (0=keep, 1=fully regenerate)
+        # controlnet_conditioning_scale: how strongly to follow sketch structure
+        # Both should be high for sketch→photorealistic: replace pixels but keep shape
         result = self._pipe(
             prompt=self._prompt,
             image=image,
             control_image=control_image,
-            strength=max(self._strength, 0.75),
+            strength=self._strength,
             controlnet_conditioning_scale=self.model_config.controlnet_conditioning_scale,
             num_inference_steps=self.model_config.num_inference_steps,
             guidance_scale=self.model_config.guidance_scale,

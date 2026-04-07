@@ -8,7 +8,7 @@ export const CANVAS_EXPORT_QUALITY = 0.7;
 export const CANVAS_EXPORT_FORMAT: "jpeg" | "png" = "jpeg";
 
 export const DEFAULT_PROMPT = "high quality, detailed, photorealistic";
-export const DEFAULT_STRENGTH = 0.5;
+export const DEFAULT_STRENGTH = 0.7;
 
 export const WS_RECONNECT_BASE_MS = 1000;
 export const WS_RECONNECT_MAX_MS = 30000;
