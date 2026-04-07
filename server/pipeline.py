@@ -11,6 +11,7 @@ from PIL import Image
 from diffusers import (
     AutoencoderTiny,
     ControlNetModel,
+    LCMScheduler,
     StableDiffusionControlNetImg2ImgPipeline,
 )
 
@@ -63,6 +64,9 @@ class RealtimeCanvasPipeline:
             safety_checker=None,
         ).to("cuda")
 
+        logger.info("Switching to LCM scheduler...")
+        self._pipe.scheduler = LCMScheduler.from_config(self._pipe.scheduler.config)
+
         logger.info("Loading LCM-LoRA...")
         self._pipe.load_lora_weights(lcm_path)
         self._pipe.fuse_lora()
@@ -76,7 +80,7 @@ class RealtimeCanvasPipeline:
 
         logger.info("Compiling UNet with torch.compile...")
         self._pipe.unet = torch.compile(
-            self._pipe.unet, mode="reduce-overhead", fullgraph=True
+            self._pipe.unet, mode="max-autotune", fullgraph=True
         )
 
         logger.info("Running warm-up inference...")
