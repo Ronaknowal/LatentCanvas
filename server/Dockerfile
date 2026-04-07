@@ -1,4 +1,4 @@
-FROM runpod/pytorch:2.1.0-py3.10-cuda11.8.0-devel-ubuntu22.04
+FROM runpod/pytorch:2.4.1-py3.11-cuda12.4.1-devel-ubuntu22.04
 
 WORKDIR /app
 
@@ -7,12 +7,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1-mesa-glx libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python deps
+# Install PyTorch matching the CUDA version in the base image
+RUN pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cu124
+
+# Install Python deps (torch excluded — already installed above)
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Install StreamDiffusion
-RUN pip install --no-cache-dir streamdiffusion
+# Install xformers (auto-resolves correct version for installed torch)
+RUN pip install --no-cache-dir xformers
 
 # Copy application code
 COPY . .

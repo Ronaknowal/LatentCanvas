@@ -1,17 +1,29 @@
-torch>=2.1.0
-torchvision>=0.16.0
+# PyTorch — install separately with the correct CUDA index URL BEFORE this file:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu126
+# Do NOT uncomment these — they'll pull the wrong CUDA variant:
+# torch>=2.1.0
+# torchvision>=0.16.0
+
+# Diffusion pipeline
 diffusers>=0.25.0
 transformers>=4.36.0
 accelerate>=0.25.0
 safetensors>=0.4.0
-xformers>=0.0.23
+controlnet_aux>=0.0.7
+huggingface_hub>=0.20.0
+
+# xformers — must match your torch version. Install separately:
+#   pip install xformers (after torch is installed, pip resolves the right version)
+# xformers
+
+# Server
 fastapi>=0.109.0
 uvicorn[standard]>=0.25.0
 websockets>=12.0
 pillow>=10.2.0
 numpy>=1.26.0
-huggingface_hub>=0.20.0
-controlnet_aux>=0.0.7
+
+# Testing
 pytest>=7.4.0
 pytest-asyncio>=0.23.0
 httpx>=0.26.0
