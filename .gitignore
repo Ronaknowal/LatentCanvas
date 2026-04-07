@@ -1,0 +1,27 @@
+# server
+server/__pycache__/
+server/tests/__pycache__/
+__pycache__/
+*.pyc
+.pytest_cache/
+
+# frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+
+# environment
+.env
+.env.local
+*.env
+
+# models (large files)
+models/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
