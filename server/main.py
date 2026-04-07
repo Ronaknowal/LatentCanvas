@@ -7,17 +7,27 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 
-from config import SD15_CONFIG, SERVER_CONFIG
-from pipeline import RealtimeCanvasPipeline
+from config import ACTIVE_MODEL, SERVER_CONFIG
 from inference_queue import InferenceQueue
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-pipeline = RealtimeCanvasPipeline(
-    model_config=SD15_CONFIG,
-    server_config=SERVER_CONFIG,
-)
+
+def create_pipeline(model_config, server_config):
+    """Factory: create the right pipeline based on model type."""
+    if model_config.pipeline_type == "sd15":
+        from pipeline import RealtimeCanvasPipeline
+        return RealtimeCanvasPipeline(model_config=model_config, server_config=server_config)
+    elif model_config.pipeline_type in ("flux_dev", "flux_schnell"):
+        from pipeline_flux import FluxCanvasPipeline
+        return FluxCanvasPipeline(model_config=model_config, server_config=server_config)
+    else:
+        raise ValueError(f"Unknown pipeline type: {model_config.pipeline_type}")
+
+
+logger.info(f"Selected model: {ACTIVE_MODEL.name} ({ACTIVE_MODEL.pipeline_type})")
+pipeline = create_pipeline(ACTIVE_MODEL, SERVER_CONFIG)
 
 
 @asynccontextmanager
