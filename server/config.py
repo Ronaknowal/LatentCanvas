@@ -14,8 +14,8 @@ class ModelConfig:
     height: int = 512
     num_inference_steps: int = 4
     t_index_list: list[int] = field(default_factory=lambda: [0, 16, 32, 45])
-    guidance_scale: float = 1.0
-    controlnet_conditioning_scale: float = 0.7
+    guidance_scale: float = 1.5
+    controlnet_conditioning_scale: float = 0.9
 
 
 @dataclass
@@ -27,7 +27,7 @@ class ServerConfig:
     similarity_threshold: float = 0.98
     similarity_max_skip: int = 10
     default_prompt: str = "high quality, detailed, photorealistic"
-    default_strength: float = 0.5
+    default_strength: float = 0.85
 
 
 SD15_CONFIG = ModelConfig(
